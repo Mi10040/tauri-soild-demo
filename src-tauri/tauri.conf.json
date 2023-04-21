@@ -12,6 +12,9 @@
   },
   "tauri": {
     "allowlist": {
+      "window": {
+        "all": true
+      },
       "all": false,
       "shell": {
         "all": false,
@@ -33,7 +36,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "buildDemo",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -62,8 +65,9 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "tauri-solid-demo",
-        "width": 800
+        "title": "DEV",
+        "width": 800,
+        "decorations": false
       }
     ]
   }
