@@ -5,3 +5,10 @@ This template should help get you started developing with Tauri, Solid and Types
 ## Recommended IDE Setup
 
 - [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+
+## 无边界 ?
+
+- 边框? 
+- 多窗体?
+- 内容空间感强调
+- 空旷感 ?

@@ -12,6 +12,7 @@ const App = () => {
       module: lazy(() => import("./components/draggableDome")),
     }
   ]);
+  
   const counter = [state];
 
   return (
