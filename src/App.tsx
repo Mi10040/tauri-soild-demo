@@ -1,26 +1,17 @@
-import { For, createContext, lazy } from "solid-js";
-import { createStore } from "solid-js/store";
 import Layout from "./layout";
+import PageCounter, { CounterContext } from "./components/PageCounter";
+import { For, lazy, useContext } from "solid-js";
+import { createStore } from "solid-js/store";
 
-const CounterContext = createContext([{ count: 0 }, {}]);
 
 const App = () => {
-  const [state, setState] = createStore({ count: 0, url: "" });
-  const [moduleList, setModuleList] = createStore([
-    {
-      pageName: "A",
-      module: lazy(() => import("./components/draggableDome")),
-    }
-  ]);
-  
-  const counter = [state];
+  const [state] = useContext<any>(CounterContext);
 
   return (
-    <CounterContext.Provider value={counter}>
+    <PageCounter store={state}>
       <Layout>
-        <For each={moduleList}>{(module) => <module.module />}</For>
       </Layout>
-    </CounterContext.Provider>
+    </PageCounter>
   );
 };
 
