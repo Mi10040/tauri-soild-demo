@@ -1,42 +1,38 @@
 use std::net::UdpSocket;
 
-#[derive(Debug)]
-struct AniConnect {
+use crate::config::error::Error;
+
+pub async fn login_connect_ani_db(
+    socket: UdpSocket,
     user: String,
     pass: String,
-    socket: UdpSocket,
+) -> Result<String, Error> {
+    let login = format!(
+        "AUTH user={}&pass={}&protover=3&client=misakaudpapi&clientver=1&tag={}&enc=UTF-8",
+        user, pass, user
+    );
+    socket.connect("api.anidb.net:9000").expect("1");
+    socket
+        .send(login.as_bytes())
+        .expect("couldn't send message");
+
+    let mut buf: [u8; 256] = [0; 256];
+    socket.recv(&mut buf)?;
+    let res_str = std::str::from_utf8(&buf)?;
+    let res_vec: Vec<&str> = res_str.split(" ").collect();
+    let res_get: Option<&&str> = res_vec.get(2);
+    let res: &&str = res_get.unwrap_or(&"");
+    Ok(format!("{}", res))
 }
 
-impl AniConnect {
-    pub async fn loginConnectAniDb(&self) {
-        let login = format!(
-            "AUTH user={}&pass={}&protover=3&client=misakaudpapi&clientver=1&tag={}&enc=UTF-8",
-            self.user, self.pass, self.user
-        );
-        self.socket.connect("api.anidb.net:9000").expect("1");
-        self.socket
-            .send(login.as_bytes())
-            .expect("couldn't send message");
-
-        let mut buf: [u8; 2048] = [0; 2048];
-        match self.socket.recv(&mut buf) {
-            Ok(received) => {
-                let s = std::str::from_utf8(&buf);
-                match s {
-                    Ok(v) => {
-                        println!("Got a valid UTF-8 sequence: {}", v);
-                        let vs: Vec<&str> = v.split(" ").collect();
-                        if let Some(vsa) = vs.get(2) {
-                            skey = vsa
-                        }
-                    }
-                    Err(e) => println!("This is not valid UTF-8. {}", e),
-                };
-            }
-            Err(e) => println!("recv function failed: {e:?}"),
-        }
-    }
-}
+// match s {
+//     Ok(v) => {
+//         println!("Got a valid UTF-8 sequence: {}", v);
+//         let vs: Vec<&str> = v.split(" ").collect();
+//         return vs.get(2).unwrap_or(&"");
+//     }
+//     Err(e) => println!("This is not valid UTF-8. {}", e),。
+// };
 
 // match socket.recv(&mut buf) {
 //     Ok(received) => {
