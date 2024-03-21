@@ -1,17 +1,12 @@
-import { JSX } from "solid-js/jsx-runtime";
 import Header from "./header";
+import { ParentComponent, children } from "solid-js";
 
-// SolidJs
-type LayoutProps = {
-  children: JSX.Element;
-};
-
-const Layout = (props: LayoutProps) => {
-  const { children } = props;
+const Layout: ParentComponent = (props) => {
+  const safeChildren = children(() => props.children);
   return (
     <div>
       <Header />
-      {children}
+      {safeChildren()}
     </div>
   );
 };

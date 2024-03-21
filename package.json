@@ -20,7 +20,9 @@
     "vite-plugin-solid": "^2.3.0"
   },
   "dependencies": {
+    "@solidjs/router": "^0.13.0",
     "@tauri-apps/api": "^1.2.0",
+    "jakan": "^1.0.7",
     "lodash": "^4.17.21",
     "solid-js": "^1.4.7"
   }

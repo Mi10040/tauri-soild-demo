@@ -3,9 +3,13 @@
         ".\\src-tauri\\Cargo.toml",
         ".\\src-tauri\\Cargo.toml",
         ".\\src-tauri\\Cargo.toml",
+        ".\\src-tauri\\Cargo.toml",
+        ".\\src-tauri\\Cargo.toml",
+        ".\\src-tauri\\Cargo.toml",
         ".\\src-tauri\\Cargo.toml"
     ],
     "cSpell.words": [
         "connet"
-    ]
+    ],
+    "rust-analyzer.showUnlinkedFileNotification": false
 }

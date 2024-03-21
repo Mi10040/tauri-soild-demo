@@ -1,16 +1,21 @@
-import { useContext } from "solid-js";
-import { CounterContext } from "../../components/PageCounter";
-
-
+import { useNavigate } from "@solidjs/router";
+import Icon from "../../components/icon";
 
 const Apage = () => {
-    const [state, { increment }] = useContext<any>(CounterContext);
+  const navigate = useNavigate();
 
-    return <div>
-        {`A:${state.count}`}
-        <button onClick={() => { increment() }}>increment</button>
+  return (
+    <div>
+      <Icon style={{ color: "red" }} type="&#xe6c8;" />
+      <button
+        onClick={() => {
+          navigate("/b");
+        }}
+      >
+        increment
+      </button>
     </div>
-}
+  );
+};
 
-
-export default Apage
+export default Apage;

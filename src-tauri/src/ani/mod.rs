@@ -1,2 +1,2 @@
-pub mod login;
-pub mod quest;
+pub mod ipc;
+pub mod connect;
