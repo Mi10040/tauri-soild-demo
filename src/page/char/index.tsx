@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { For } from "solid-js";
 import { abilityModifier, defaultChar, saveToLocal, loadFromLocal } from "../../utils/char";
 
 type Stats = {
@@ -34,8 +35,16 @@ export default function CharPage() {
   const [clas, setClas] = createSignal(initial.clas || "Fighter");
   const [level, setLevel] = createSignal(initial.level || 1);
   const [stats, setStats] = createSignal<Stats>(initial.stats || genStats());
+  const [isRolling, setIsRolling] = createSignal(false);
 
-  const regenerate = () => setStats(genStats());
+  const regenerate = async () => {
+    setIsRolling(true);
+    // small delay to show animation
+    setTimeout(() => {
+      setStats(genStats());
+      setIsRolling(false);
+    }, 600);
+  };
 
   const save = () => {
     const obj = { name: name(), race: race(), clas: clas(), level: level(), stats: stats() };
@@ -108,12 +117,12 @@ export default function CharPage() {
           </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <For each={["STR", "DEX", "CON", "INT", "WIS", "CHA"] as Array<keyof Stats>}>
             {(key) => (
-              <div class="p-4 bg-gray-50 rounded-md text-center">
+              <div class={`p-4 rounded-md text-center transition transform ${isRolling() ? 'scale-105 animate-pulse' : 'hover:shadow-lg hover:-translate-y-1'}`}>
                 <div class="text-sm text-gray-500">{key}</div>
-                <div class="text-3xl font-bold">{stats()[key]}</div>
+                <div class="text-4xl font-extrabold text-indigo-600">{stats()[key]}</div>
                 <div class="text-sm text-gray-600">{(abilityModifier(stats()[key]) >= 0 ? "+" : "") + abilityModifier(stats()[key])}</div>
               </div>
             )}
@@ -123,14 +132,14 @@ export default function CharPage() {
         <div class="border-t pt-4">
           <h2 class="text-lg font-medium mb-2">人物卡预览</h2>
           <div class="flex items-start gap-6">
-            <div class="w-1/3 bg-gray-100 p-4 rounded">
+            <div class="w-1/3 bg-gradient-to-br from-white to-gray-100 p-4 rounded shadow-sm">
               <div class="text-xs text-gray-500">姓名</div>
               <div class="text-xl font-semibold">{name() || "未命名"}</div>
               <div class="text-xs text-gray-500 mt-3">职业 / 种族 / 等级</div>
               <div class="text-sm">{clas()} / {race()} / {level()}</div>
             </div>
 
-            <div class="flex-1 bg-gray-100 p-4 rounded">
+            <div class="flex-1 bg-gradient-to-br from-white to-gray-100 p-4 rounded shadow-sm">
               <div class="grid grid-cols-6 gap-2 text-center">
                 <div class="text-xs text-gray-500">STR</div>
                 <div class="text-xs text-gray-500">DEX</div>
@@ -139,12 +148,12 @@ export default function CharPage() {
                 <div class="text-xs text-gray-500">WIS</div>
                 <div class="text-xs text-gray-500">CHA</div>
 
-                <div class="text-lg font-bold">{stats().STR}</div>
-                <div class="text-lg font-bold">{stats().DEX}</div>
-                <div class="text-lg font-bold">{stats().CON}</div>
-                <div class="text-lg font-bold">{stats().INT}</div>
-                <div class="text-lg font-bold">{stats().WIS}</div>
-                <div class="text-lg font-bold">{stats().CHA}</div>
+                <div class="text-lg font-bold text-indigo-600">{stats().STR}</div>
+                <div class="text-lg font-bold text-indigo-600">{stats().DEX}</div>
+                <div class="text-lg font-bold text-indigo-600">{stats().CON}</div>
+                <div class="text-lg font-bold text-indigo-600">{stats().INT}</div>
+                <div class="text-lg font-bold text-indigo-600">{stats().WIS}</div>
+                <div class="text-lg font-bold text-indigo-600">{stats().CHA}</div>
 
                 <div class="text-sm text-gray-600">{(abilityModifier(stats().STR) >= 0 ? "+" : "") + abilityModifier(stats().STR)}</div>
                 <div class="text-sm text-gray-600">{(abilityModifier(stats().DEX) >= 0 ? "+" : "") + abilityModifier(stats().DEX)}</div>
