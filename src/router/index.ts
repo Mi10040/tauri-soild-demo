@@ -6,6 +6,10 @@ export const routerList = [
     component: lazy(() => import("../page/a")),
   },
   {
+    path: "/char",
+    component: lazy(() => import("../page/char")),
+  },
+  {
     path: "/B",
     component: lazy(() => import("../page/b")),
   },
