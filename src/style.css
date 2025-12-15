@@ -18,3 +18,15 @@
 body {
   margin: 0;
 }
+
+/* Tailwind base, components, utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Print friendly card */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .max-w-4xl { width: 100% !important; }
+}

@@ -1,8 +1,8 @@
 {
   "build": {
-    "beforeDevCommand": "yarn dev",
+    "beforeDevCommand": "yarn build",
     "beforeBuildCommand": "yarn build",
-    "devPath": "http://localhost:1420",
+    "devPath": "../dist",
     "distDir": "../dist",
     "withGlobalTauri": false
   },
@@ -19,6 +19,9 @@
       "shell": {
         "all": false,
         "open": true
+      },
+      "http": {
+        "scope": ["https://cdn-eu.anidb.net/images/main/**"]
       }
     },
     "bundle": {
