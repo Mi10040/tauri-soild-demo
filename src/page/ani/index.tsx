@@ -1,6 +1,6 @@
 import { For, createEffect, createSignal, lazy, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { invoke } from "@tauri-apps/api";
+import { login, query, logout, updated } from "../../ipc";
 
 const doem = () => {
   const [name, setName] = createSignal("Misaka10040");
@@ -22,13 +22,9 @@ const doem = () => {
         }}
       />
       <button
-        onclick={async () => {
-          await invoke("login", {
-            username: name(),
-            password: pass(),
-          }).then((data) => {
-            console.log(data);
-          });
+        onClick={async () => {
+          const data = await login(name(), pass());
+          console.log(data);
         }}
       >
         Login
@@ -40,31 +36,28 @@ const doem = () => {
         }}
       />
       <button
-        onclick={async () => {
-          await invoke("query", { name: ani() }).then((data) => {
-            console.log(data);
-          });
+        onClick={async () => {
+          const data = await query(ani());
+          console.log(data);
         }}
       >
         Query
       </button>
 
       <button
-        onclick={async () => {
-          await invoke("logout", {}).then((data) => {
-            console.log(data);
-          });
+        onClick={async () => {
+          const data = await logout();
+          console.log(data);
         }}
       >
         Logout
       </button>
       <button
-        onclick={async () => {
-          await invoke("updated", {}).then((data) => {
-            console.log(data);
-            const imgsList = `${data}`.split("|");
-            setImg(imgsList[imgsList.length - 1]);
-          });
+        onClick={async () => {
+          const data = await updated();
+          console.log(data);
+          const imgsList = `${data}`.split("|");
+          setImg(imgsList[imgsList.length - 1]);
         }}
       >
         updated
@@ -75,7 +68,7 @@ const doem = () => {
       ) : (
         <img
           src={`https://cdn-eu.anidb.net/images/main/${img()}`}
-          referrerpolicy="no-referrer"
+          referrerPolicy="no-referrer"
         />
       )}
     </div>
