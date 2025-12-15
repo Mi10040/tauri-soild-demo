@@ -24,108 +24,94 @@ impl SingletonUdpClient {
             .expect("Could not connect to server");
 
         SingletonUdpClient {
-            // 初始化socket为None
             socket: Mutex::new(socket),
-            // 初始化s_key为None
             s_key: Mutex::new(None),
         }
     }
 
     // login方法用于向服务器发送登录消息并建立连接
     pub fn login(&self, username: &str, password: &str) -> Result<String, Error> {
-        let socket = self.socket.lock().unwrap();
-        // 创建登录消息
+        let socket = self.socket.lock().map_err(|e| Error::System(e.to_string()))?;
         let login_message = format!(
             "AUTH user={}&pass={}&protover=3&client=misakaudpapi&clientver=1&tag={}&enc=UTF-8",
             username, password, username
         );
 
-        // 发送登录消息
-        socket
-            .send(login_message.as_bytes())
-            .expect("Failed to send login message");
+        socket.send(login_message.as_bytes())?;
 
-        // 接收服务器的响应
         let mut buf: [u8; 256] = [0; 256];
-        socket.recv(&mut buf)?;
-        let res_str = std::str::from_utf8(&buf)?;
-        let res_vec: Vec<&str> = res_str.split(" ").collect();
-        let res_get: Option<&&str> = res_vec.get(2);
-        let res: &&str = res_get.unwrap_or(&"");
+        let n = socket.recv(&mut buf)?;
+        let res_str = std::str::from_utf8(&buf[..n])?;
+        let res_vec: Vec<&str> = res_str.split(' ').collect();
+        let res_opt = res_vec.get(2).cloned();
+        let res = match res_opt {
+            Some(v) if !v.is_empty() => v.to_string(),
+            _ => return Err(Error::Business("invalid login response".into())),
+        };
 
-        // 提取s_key并存储到s_key字段中
-        let mut s_key = self.s_key.lock().unwrap();
-        *s_key = Some(res.to_string());
+        let mut s_key = self.s_key.lock().map_err(|e| Error::System(e.to_string()))?;
+        *s_key = Some(res);
 
-        Ok(format!("{}", res_str))
+        Ok(res_str.to_string())
     }
 
     // query方法用于向服务器发送查询
     pub fn query(&self, query: &str) -> Result<String, Error> {
         // 获取socket
-        let socket = self.socket.lock().unwrap();
-        // 获取s_key
-        let s_key = self.s_key.lock().unwrap();
+        let socket = self.socket.lock().map_err(|e| Error::System(e.to_string()))?;
+        let s_key_guard = self.s_key.lock().map_err(|e| Error::System(e.to_string()))?;
+        let s_key = s_key_guard
+            .as_ref()
+            .ok_or_else(|| Error::Business("not authenticated".into()))?;
 
-        // 创建查询消息
-        // let query_message = format!("ANIME aname={}&s={}", query, s_key.as_ref().unwrap());
-        let query_message = format!("ANIME aid={}&s={}", query, s_key.as_ref().unwrap());
+        let query_message = format!("ANIME aid={}&s={}", query, s_key);
 
-        // 发送查询消息
-        socket
-            .send(query_message.as_bytes())
-            .expect("Failed to send query");
+        socket.send(query_message.as_bytes())?;
         let mut buf: [u8; 2048] = [0; 2048];
+        let n = socket.recv(&mut buf)?;
+        let res = std::str::from_utf8(&buf[..n])?;
 
-        socket.recv(&mut buf)?;
-        let res = std::str::from_utf8(&buf)?;
-
-        Ok(format!("{}", res))
+        Ok(res.to_string())
     }
 
     // LOGOUT
     pub fn logout(&self) -> Result<String, Error> {
         // 获取socket
-        let socket = self.socket.lock().unwrap();
-        // 获取s_key
-        let s_key = self.s_key.lock().unwrap();
+        let socket = self.socket.lock().map_err(|e| Error::System(e.to_string()))?;
+        let s_key_guard = self.s_key.lock().map_err(|e| Error::System(e.to_string()))?;
+        let s_key = s_key_guard
+            .as_ref()
+            .ok_or_else(|| Error::Business("not authenticated".into()))?;
 
-        // 创建查询消息
-        // let query_message = format!("ANIME aname={}&s={}", query, s_key.as_ref().unwrap());
-        let logout_message = format!("LOGOUT s={}", s_key.as_ref().unwrap());
+        let logout_message = format!("LOGOUT s={}", s_key);
 
-        // 发送查询消息
-        socket
-            .send(logout_message.as_bytes())
-            .expect("Failed to send logout");
+        socket.send(logout_message.as_bytes())?;
         let mut buf: [u8; 256] = [0; 256];
+        let n = socket.recv(&mut buf)?;
+        let res = std::str::from_utf8(&buf[..n])?;
 
-        socket.recv(&mut buf)?;
-        let res = std::str::from_utf8(&buf)?;
-
-        Ok(format!("{}", res))
+        Ok(res.to_string())
     }
 
     // 更新的 UPDATED entity=1
     pub fn updated(&self) -> Result<String, Error> {
         // 获取socket
-        let socket = self.socket.lock().unwrap();
-        // 获取s_key
-        let s_key = self.s_key.lock().unwrap();
+        let socket = self.socket.lock().map_err(|e| Error::System(e.to_string()))?;
+        let s_key_guard = self.s_key.lock().map_err(|e| Error::System(e.to_string()))?;
+        let s_key = s_key_guard
+            .as_ref()
+            .ok_or_else(|| Error::Business("not authenticated".into()))?;
 
-        let updated_message = format!("RANDOMANIME type=0&s={}", s_key.as_ref().unwrap());
+        let updated_message = format!("RANDOMANIME type=0&s={}", s_key);
 
-        socket
-            .send(updated_message.as_bytes())
-            .expect("Failed to send logout");
+        socket.send(updated_message.as_bytes())?;
         let mut buf = vec![0u8; 2048];
+        let n = socket.recv(&mut buf)?;
+        let res = std::str::from_utf8(&buf[..n])?;
 
-        socket.recv(&mut buf)?;
-        let res = std::str::from_utf8(&buf)?;
-        
         println!("{}", res);
 
-        Ok(format!("{}", res))
+        Ok(res.to_string())
     }
 }
 

@@ -21,3 +21,19 @@ impl From<Utf8Error> for Error {
         Error::System(err.to_string())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn utf8_from_converts_to_system() {
+        let bytes = [0xffu8];
+        let utf8_err = std::str::from_utf8(&bytes).unwrap_err();
+        let err: Error = utf8_err.into();
+        match err {
+            Error::System(s) => assert!(!s.is_empty()),
+            _ => panic!("expected System variant"),
+        }
+    }
+}
